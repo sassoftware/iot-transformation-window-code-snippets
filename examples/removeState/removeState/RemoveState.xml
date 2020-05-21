@@ -1,0 +1,44 @@
+<project name="RemoveState" threads="1" pubsub="auto" heartbeat-interval="1">
+  <metadata>
+    <meta id="studioUploadedBy">fsduser</meta>
+    <meta id="studioUploaded">1556720646470</meta>
+    <meta id="studioModifiedBy">fsduser</meta>
+    <meta id="studioModified">1556721635482</meta>
+    <meta id="layout">{"cq1":{"Copy":{"x":-195,"y":-90},"SourceWindow":{"x":-210,"y":-360},"removeStateWindow":{"x":-205,"y":-225}}}</meta>
+  </metadata>
+  <contqueries>
+    <contquery name="cq1" include-singletons="true" trace="removeStateWindow">
+      <windows>
+        <window-source pubsub="true" name="SourceWindow">
+          <schema>
+            <fields>
+              <field name="ID" type="int32" key="true"/>
+              <field name="symbol" type="string"/>
+              <field name="true_test" type="int32"/>
+              <field name="price" type="double"/>
+            </fields>
+          </schema>
+          <connectors>
+            <connector class="fs" name="pub1">
+              <properties>
+                <property name="type"><![CDATA[pub]]></property>
+                <property name="transactional"><![CDATA[false]]></property>
+                <property name="blocksize"><![CDATA[1]]></property>
+                <property name="fsname"><![CDATA[/data/input/InputRemove.csv]]></property>
+                <property name="fstype"><![CDATA[csv]]></property>
+              </properties>
+            </connector>
+          </connectors>
+        </window-source>
+        <window-remove-state remove="updates deletes retentionUpdates retentionDeletes" pubsub="true" add-log-fields="true" name="removeStateWindow"/>
+        <window-copy pubsub="true" index="pi_RBTREE" name="Copy">
+          <retention type="bytime_sliding"><![CDATA[30 seconds]]></retention>
+        </window-copy>
+      </windows>
+      <edges>
+        <edge source="SourceWindow" target="removeStateWindow"/>
+        <edge source="removeStateWindow" target="Copy"/>
+      </edges>
+    </contquery>
+  </contqueries>
+</project>

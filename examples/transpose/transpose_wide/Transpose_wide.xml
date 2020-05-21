@@ -1,0 +1,57 @@
+<project name="Transpose_wide" threads="2" pubsub="auto" heartbeat-interval="1">
+  <metadata>
+    <meta id="studioUploadedBy">fsduser</meta>
+    <meta id="studioUploaded">1556726883444</meta>
+    <meta id="studioModifiedBy">fsduser</meta>
+    <meta id="studioModified">1556727905055</meta>
+    <meta id="layout">{"transpose_cq":{"SourceW":{"x":-95,"y":-35},"TransposeW":{"x":-90,"y":145}}}</meta>
+  </metadata>
+  <contqueries>
+    <contquery name="transpose_cq" trace="TransposeW">
+      <windows>
+        <window-source pubsub="true" index="pi_EMPTY" insert-only="true" name="SourceW">
+          <schema>
+            <fields>
+              <field name="ID" type="int64" key="true"/>
+              <field name="PlaneID" type="string"/>
+              <field name="TAG" type="string"/>
+              <field name="value" type="double"/>
+              <field name="time" type="stamp"/>
+              <field name="lat" type="double"/>
+              <field name="long" type="double"/>
+            </fields>
+          </schema>
+          <connectors>
+            <connector class="fs" name="pub">
+              <properties>
+                <property name="type"><![CDATA[pub]]></property>
+                <property name="transactional"><![CDATA[false]]></property>
+                <property name="blocksize"><![CDATA[1]]></property>
+                <property name="dateformat"><![CDATA[%Y-%m-%d %H:%M:%S]]></property>
+                <property name="rate"><![CDATA[1]]></property>
+                <property name="fsname"><![CDATA[/data/input/transpose.csv]]></property>
+                <property name="fstype"><![CDATA[csv]]></property>
+              </properties>
+            </connector>
+          </connectors>
+        </window-source>
+        <window-transpose name="TransposeW" clear-timeout="never" pubsub="true" mode="wide" tag-name="TAG" tags-included="pitch,roll,yaw,velocity" tag-values="value,time" group-by="PlaneID">
+          <connectors>
+            <connector class="fs" name="sub">
+              <properties>
+                <property name="type"><![CDATA[sub]]></property>
+                <property name="dateformat"><![CDATA[%Y-%m-%d %H:%M:%S]]></property>
+                <property name="snapshot"><![CDATA[false]]></property>
+                <property name="fsname"><![CDATA[/data/input/output_wide.csv]]></property>
+                <property name="fstype"><![CDATA[csv]]></property>
+              </properties>
+            </connector>
+          </connectors>
+        </window-transpose>
+      </windows>
+      <edges>
+        <edge source="SourceW" target="TransposeW"/>
+      </edges>
+    </contquery>
+  </contqueries>
+</project>

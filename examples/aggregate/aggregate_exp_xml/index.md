@@ -8,7 +8,7 @@ Use the following steps to execute the aggregate_exp_xml code snippet:
 
 2.  Upload the `input.csv` file to the server directory you just created.
 
-3.  Upload the `model.xml` file to SAS ESP Studio. Refer to the [Uploading a Model to ESP Studio](docs/Uploading_a_Model_to_ESP_Studio.pdf) document for instructions.
+3.  Upload the `model.xml` file to SAS ESP Studio. Refer to the [Uploading a Model to ESP Studio](../../../docs/Uploading_a_Model_to_ESP_Studio.pdf) document for instructions.
   
 4.  Double-click the project named `project` to open it.
 

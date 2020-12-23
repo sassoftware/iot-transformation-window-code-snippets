@@ -69,7 +69,7 @@ The Remove State window allows you to transition a stateful part of a model into
 
 ### Transpose Window
 
-The Transpose window changes a event rows as columns, or columns as event rows. The following examples demonstrate the use of the Transpose window. 
+A Transpose window converts an event’s columns into rows, or rows into columns. The following examples demonstrate the use of the Transpose window. 
 
 | Example | Description |
 | ------ | ------ |

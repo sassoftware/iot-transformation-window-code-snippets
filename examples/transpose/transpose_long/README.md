@@ -1,23 +1,52 @@
-# transpose_long Instructions
+> Refer to the [Instructions](instructions.md) document for steps to execute this code snippet.
 
-This example transposes information in long mode. You will process information about the pitch, yaw, roll, and velocity of an aircraft in flight.
+# transpose_long
 
-Use the following steps to execute the transpose_long code snippet:
+The transpose_long code snippet includes a single source window and a transpose window. This example transposes information in long mode. It processes information about the pitch, yaw, roll, and velocity of an aircraft in flight.
 
-1.  Create a directory on the ESP server for the example.
+<img src='../../../images/tl_model.png'>
 
-2.  Upload the `input_long.csv` file to the server directory you just created.
+## Transpose Window Overview
 
-3.  Upload the `Transpose_long.xml` file to SAS ESP Studio. Refer to the [Uploading a Model to ESP Studio](../../../docs/Uploading_a_Model_to_ESP_Studio.pdf) document for instructions.
-  
-4.  Double-click the project named `Transpose_long` to open it.
+Events can be visualized as a row of information with columns. A Transpose window converts an event’s columns into rows, or rows into columns.
 
-5.  Edit the Input Data Connector for the `SourceW` window to include the full path to the `input_long.csv` file you uploaded. Refer to the [Editing Connectors](../../../docs/Connectors.pdf) document for instructions.
+There are two modes for the Transpose window, wide and long. The following table provides a description of these modes:
 
-6.  Edit the Subscriber Connector for the `TransposeL` window to include the full path to the `output.csv` file that will be created. Refer to the [Editing Connectors](../../../docs/Connectors.pdf) document for instructions.
+| Mode | Description |
+| ------ | ------ |
+| wide | Converts event rows into columns. Produces one event per incoming event. |
+| long | Converts event columns into rows. Produces one or more events per incoming event. |
 
-7.  Save your changes and test your model. Refer to the [Testing Models](../../../docs/Testing_Models.pdf) document for instrcutions.
+### Long Mode
 
-8.  Execute the model on the ESP Server and Subscribe to the `TransposeL` window using ESP Streamviewer. Refer to the [Executing a Model and Viewing the Output](../../../docs/Executing_a_Model_and_Viewing_the_Output.pdf) document for instructions.
+In long mode, an incoming event’s columns are transposed into rows. The Transpose window streams several events for each wide input event. For example, an input event includes columns for an aircraft’s pitch, roll, yaw, and velocity. The Transpose window in long mode will output one event for pitch, another event, for roll, and so on.
 
-9.  Download and open the `output.csv` file created by the model.
+### Tags
+
+The Transpose window is controlled by tags. There are two parameters, `tag-values` and `tags-included`, that provide the tag information. The following table provides an explanation of these parameters:
+
+| Parameter | Explanation |
+| ------ | ------ |
+| tag-values | Specifies the values of each tag that are in columns. Example: value, time |
+| tags-included | Specifies the tags or sets of columns. Example: pitch, roll, yaw, velocity |
+
+The input schema of the Transpose window must include combinations of tags and tag-values as field names. For example, there must be a field for `pitch_value`, `pitch_time`, `roll_value`, `roll_time`, etc.
+
+## Event Flow Description
+
+This example includes a single wide input event. The Transpose window is in long mode. The `tag-values` are `value` and `time`. The `tags-included` are `pitch`, `roll`, `yaw`, and `velocity`.
+
+The following is a description of how this event is processed by the Transpose window.
+
+### Event #1
+
+<img src='../../../images/tl_event1.png' width='950px'>
+
+The Source window inserts the event and it streams to the Transpose window. The Transpose window processes the first tag, `pitch`. It streams an event with an `ID` of `1`, `tagNum 0`, `TAG pitch`, `value` (from pitch_value), `time` (from pitch_time), `lat`, and `long`. 
+
+The Transpose window then streams an event each for `roll`, `yaw`, and `velocity`.
+
+
+
+
+

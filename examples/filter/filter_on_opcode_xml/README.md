@@ -1,23 +1,114 @@
-# filter_on_opcode_xml Instructions
+> Refer to the [Instructions](instructions.md) document for steps to execute this code snippet.
 
-This example contains a single source window followed by one filter window. The filter window uses ESP_OPCODE to filter out all but events with an opCode of insert.
+# filter_on_opcode_xml
 
-Use the following steps to execute the filter_on_opcode_xml code snippet:
+The filter_on_opcode_xml code snippet includes a single source window followed by one filter window. The filter window uses ESP_OPCODE to filter out all but events with an OpCode of Insert.
 
-1.  Create a directory on the ESP server for the example.
+<img src='../../../images/foo_model.png'>
 
-2.  Upload the `input.csv` file to the server directory you just created.
+_Figure 1 - Model_
 
-3.  Upload the `modelfilteropcode.xml` file to SAS ESP Studio. Refer to the [Uploading a Model to ESP Studio](../../../docs/Uploading_a_Model_to_ESP_Studio.pdf) document for instructions.
-  
-4.  Double-click the project named `projectfilteropcode` to open it.
+## Table of Contents
 
-5.  Edit the Input Data Connector for the `sourceWindow` window to include the full path to the `input.csv` file you uploaded. Refer to the [Editing Connectors](../../../docs/Connectors.pdf) document for instructions.
+* [Filter Window Overview](#filter-window-overview)
+	* [ESP OpCodes](#esp-opcodes)
+	* [Entering Filter Conditions in SAS ESP Studio](#entering-filter-conditions-in-sas-esp-studio)
+* [Event Flow Description](#event-flow-description)
+	* [Event 1](#event-1)
+	* [Event 2](#event-2)
+	* [Event 3](#event-3)
+	* [Event 4](#event-4)
+	* [Event 5](#event-5)
 
-6.  Edit the Subscriber Connector for the `filterWindow` window to include the full path to the `filter.out` file that will be created. Refer to the [Editing Connectors](../../../docs/Connectors.pdf) document for instructions.
+## Filter Window Overview
 
-7.  Save your changes and test your model. Refer to the [Testing Models](../../../docs/Testing_Models.pdf) document for instrcutions.
+Filter windows allow only certain events to stream through to the downstream portion of the model. They use expressions, user-defined functions, and registered plug-in functions as filter conditions. This example uses an expression to filter out events except those with an OpCode of Insert.
 
-8.  Execute the model on the ESP Server and Subscribe to the `filterWindow` window using ESP Streamviewer. Refer to the [Executing a Model and Viewing the Output](../../../docs/Executing_a_Model_and_Viewing_the_Output.pdf) document for instructions.
+### ESP OpCodes
 
-9.  Download and open the `filter.out` file created by the model.
+Events include two types of metadata, the operation code (OpCode) and the flags of the event. The following table lists the OpCodes used by ESP and provides a description of each:
+
+| OpCode | Description |
+| ------ | ------ |
+| Insert (I) | Adds event data to a window. The key value must be new. |
+| Delete (D) | Removes event data from a window. The key value must already exist. |
+| Update (U) | Changes event data in a window. The key value must already exist. |
+| Upsert (P) | Updates event data in a window if the key value already exists. Adds event data to a window if the key value does not exist. |
+| Safe Delete (SD) | Removes event data from a window without generating an error if the key value does not exist. |
+
+The following expression is used to filter out events except those with an OpCode of Insert:
+
+~~~
+ESP_OPCODE=="I"
+~~~
+
+> ESP_OPCODE is a reserved word that does not need to be defined or declared.
+
+### Entering Filter Conditions in SAS ESP Studio
+
+Use the following steps to enter a filter condition using SAS ESP Studio:
+
+1. Ensure the project is open, filter window is selected, and the properties are displayed.
+
+2. Expand **Filter**.
+
+    <img src='../../../images/foo_studio1.png'>
+
+    _Figure 2 - Filter Conditions_
+
+3. Ensure **Expression** is selected under **Filter method**.
+
+4. You can enter the expression in one of two ways:
+
+    - Type the expression in the space provided.
+
+    - Click <img src='../../../images/exp_editor_icon.png'> to open the Expression Editor. Refer to the [Use the Expression Editor](https://go.documentation.sas.com/?cdcId=espcdc&cdcVersion=6.2&docsetId=espstudio&docsetTarget=n0bk8u840zhjd8n0z4c0fkei0a36.htm&locale=en#n1ta4dhkwjf3x3n1dwry4l40bj57) section of the SAS ESP documentation for more information on using the Expression Editor.
+
+5. Click <img src='../../../images/validate_icon.png'> to validate the expression.
+
+
+## Event Flow Description
+
+This example includes five input events. The Filter window is using the expression, `ESP_OPCODE==”I”`, to filter out all events except those with an OpCode of Insert.
+
+The following is a description of how these events flow through the model.
+
+### Event 1
+
+<img src='../../../images/foo_event1.png' width='866px'>
+
+_Figure 3 - Event 1_
+
+The Source window inserts the first event. The event streams to the Filter window where it is inserted, because the OpCode is Insert (i).
+
+### Event 2
+
+<img src='../../../images/foo_event2.png' width='866px'>
+
+_Figure 4 - Event 2_
+
+The second event again inserts an event into the Source window. The event streams to the Filter window where it is inserted, because the OpCode is Insert again.
+
+### Event 3
+
+<img src='../../../images/foo_event3.png' width='866px'>
+
+_Figure 5 - Event 3_
+
+The third event is inserted into the Source and Filter windows.
+
+### Event 4
+
+<img src='../../../images/foo_event4.png' width='866px'>
+
+_Figure 6 - Event 4_
+
+The next event is an Update for the first event (ID 1). The Filter window does not insert this event because the OpCode is Update.
+
+### Event 5
+
+<img src='../../../images/foo_event5.png' width='866px'>
+
+_Figure 7 - Event 5_
+
+The last event is a Delete for the original record for ID 1. Because it has an OpCode of Delete, the event is not inserted into the Filter window.
